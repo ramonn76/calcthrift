@@ -4,11 +4,23 @@ Este é um simples projeto "Hello World" em Thrift, mostrando como criar um serv
 
 ## Pré-requisitos
 
-Certifique-se de ter o Thrift instalado em seu sistema. Você pode baixar o Thrift em [thrift.apache.org](https://thrift.apache.org/download).
+Certifique-se de ter o Thrift e o composer instalados em seu sistema.
+No sistema ubuntu basta executar os commandos:
+```
+sudo apt install composer 
+```
+
+e:
+
+```
+sudo apt install thrift-compiler
+```
+
+Caso use outros sistemas, acesse: [thrift.apache.org](https://thrift.apache.org/download) e [getcomposer.org](https://getcomposer.org/). 
 
 ## Passos para executar o projeto
 
-1. Execute o seguinte comando para instalar as dependências do projeto:
+1. Após clonar e entrar dentro da pasta, execute o seguinte comando para instalar as dependências do projeto:
    ```
    composer install
    ```
@@ -37,62 +49,60 @@ Certifique-se de ter o Thrift instalado em seu sistema. Você pode baixar o Thri
    php client.php
    ```
 
-   O cliente enviará uma solicitação para o servidor e receberá a resposta "Hello World" do serviço Thrift.
+   Deve aparecer uma mensagem de saudação tanto no terminal do servidor quando no terminal do cliente.
 
 ## Descrição do projeto
 
-O arquivo "tutorial.thrift" contém a definição do serviço "Hello World" em Thrift:
+Este projeto demonstra a implementação de um serviço "Hello World" usando o Apache Thrift na linguagem PHP.
+
+### Arquivo "tutorial.thrift"
+
+O arquivo `tutorial.thrift` contém a definição do serviço "HelloService" em Thrift:
 
 ```thrift
 namespace php tutorial
 
-service HelloWorld {
-  string helloWorld()
+service HelloService {
+   string hello(1:string nome),
 }
 ```
 
-O serviço "HelloWorld" possui um único método chamado "helloWorld", que retorna uma string contendo "Hello World".
+O serviço "HelloService" possui um único método chamado "hello", que recebe uma string "nome" como parâmetro e retorna uma string com a mensagem "NomeDoServidor". Além disso, o serviço está definido dentro do namespace `tutorial`.
 
-O arquivo "server.php" implementa o servidor PHP que responde à solicitação do cliente.
+### Arquivo "server.php"
+
+O arquivo `server.php` implementa o servidor PHP que responde às solicitações do cliente.
+
+O servidor utiliza uma implementação do serviço "HelloService" definido no arquivo `tutorial.thrift`. A classe `HelloServiceHandler` é responsável por tratar as chamadas do cliente e implementar a lógica do serviço.
 
 ```php
-<?php
-require_once 'gen-php/tutorial/HelloWorld.php';
+class HelloServiceHandler implements \tutorial\HelloServiceIf {
+    protected $log = array();
 
-class HelloWorldHandler implements \tutorial\HelloWorldIf {
-  public function helloWorld() {
-    return "Hello World";
-  }
+    public function hello($nome) {
+      error_log("O cliente ".$nome." disse alô!");
+      return "NomeDoServidor";
+    }
 }
-
-$handler = new HelloWorldHandler();
-$processor = new \tutorial\HelloWorldProcessor($handler);
-
-$transport = new \Thrift\Transport\TPhpStream(TPhpStream::MODE_R | TPhpStream::MODE_W);
-$protocol = new \Thrift\Protocol\TBinaryProtocol($transport, true, true);
-
-$transport->open();
-$processor->process($protocol, $protocol);
-$transport->close();
 ```
 
-O arquivo "client.php" implementa o cliente PHP que faz uma solicitação ao servidor.
+No método `hello`, a mensagem do cliente é registrada no log do servidor e a resposta "NomeDoServidor" é retornada.
+
+O servidor utiliza os recursos do Thrift para configurar a comunicação, incluindo a criação de um socket, a definição do protocolo de comunicação (TBinaryProtocol), e a criação de um TSimpleServer para atender às solicitações do cliente.
+
+### Arquivo "client.php"
+
+O arquivo `client.php` implementa o cliente PHP que faz uma solicitação ao servidor.
+
+O cliente utiliza a implementação gerada pelo Thrift para se comunicar com o serviço "HelloService". Ele se conecta ao servidor usando um socket e envia a string "NomeDoCliente" como parâmetro para o método `hello` do serviço.
 
 ```php
-<?php
-require_once 'gen-php/tutorial/HelloWorld.php';
-
-$socket = new \Thrift\Transport\TSocket('localhost', 9090);
-$transport = new \Thrift\Transport\TBufferedTransport($socket);
-$protocol = new \Thrift\Protocol\TBinaryProtocol($transport);
-
-$client = new \tutorial\HelloWorldClient($protocol);
-
+$client = new \tutorial\HelloServiceClient($protocol);
 $transport->open();
-$response = $client->helloWorld();
+$clientName = "NomeDoCliente";
+$ret = $client->hello($clientName);
+print 'O Servidor disse: ' . $ret . "\n";
 $transport->close();
-
-echo "Resposta do servidor: " . $response . "\n";
 ```
 
-Este projeto demonstra a simplicidade de criar um serviço básico em Thrift usando a linguagem PHP. Você pode expandir este exemplo para criar serviços mais complexos e realizar comunicação entre diferentes plataformas de maneira fácil e eficiente.
+O cliente recebe a resposta do servidor e imprime a mensagem recebida.
