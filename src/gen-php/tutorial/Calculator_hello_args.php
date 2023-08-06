@@ -21,11 +21,25 @@ class Calculator_hello_args
     static public $isValidate = false;
 
     static public $_TSPEC = array(
+        1 => array(
+            'var' => 'nome',
+            'isRequired' => false,
+            'type' => TType::STRING,
+        ),
     );
 
+    /**
+     * @var string
+     */
+    public $nome = null;
 
-    public function __construct()
+    public function __construct($vals = null)
     {
+        if (is_array($vals)) {
+            if (isset($vals['nome'])) {
+                $this->nome = $vals['nome'];
+            }
+        }
     }
 
     public function getName()
@@ -47,6 +61,13 @@ class Calculator_hello_args
                 break;
             }
             switch ($fid) {
+                case 1:
+                    if ($ftype == TType::STRING) {
+                        $xfer += $input->readString($this->nome);
+                    } else {
+                        $xfer += $input->skip($ftype);
+                    }
+                    break;
                 default:
                     $xfer += $input->skip($ftype);
                     break;
@@ -61,6 +82,11 @@ class Calculator_hello_args
     {
         $xfer = 0;
         $xfer += $output->writeStructBegin('Calculator_hello_args');
+        if ($this->nome !== null) {
+            $xfer += $output->writeFieldBegin('nome', TType::STRING, 1);
+            $xfer += $output->writeString($this->nome);
+            $xfer += $output->writeFieldEnd();
+        }
         $xfer += $output->writeFieldStop();
         $xfer += $output->writeStructEnd();
         return $xfer;

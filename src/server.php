@@ -32,8 +32,9 @@ class CalculatorHandler implements \tutorial\CalculatorIf {
         error_log("ping()");
     }
 
-    public function hello(){
-      error_log("ola mundo");
+    public function hello($nome ){
+      error_log("ola mundo".$nome);
+      return "ola mundo".$nome;
     }
 
     public function add($num1, $num2) {

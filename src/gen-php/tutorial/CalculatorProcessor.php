@@ -16,11 +16,12 @@ use Thrift\Protocol\TProtocol;
 use Thrift\Protocol\TBinaryProtocolAccelerated;
 use Thrift\Exception\TApplicationException;
 
-class CalculatorProcessor extends \shared\SharedServiceProcessor
+class CalculatorProcessor
 {
+    protected $handler_ = null;
     public function __construct($handler)
     {
-        parent::__construct($handler);
+        $this->handler_ = $handler;
     }
 
     public function process($input, $output)
@@ -60,7 +61,7 @@ class CalculatorProcessor extends \shared\SharedServiceProcessor
         }
         $input->readMessageEnd();
         $result = new \tutorial\Calculator_hello_result();
-        $this->handler_->hello();
+        $result->success = $this->handler_->hello($args->nome);
         $bin_accel = ($output instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
         if ($bin_accel) {
             thrift_protocol_write_binary(
@@ -77,125 +78,5 @@ class CalculatorProcessor extends \shared\SharedServiceProcessor
             $output->writeMessageEnd();
             $output->getTransport()->flush();
         }
-    }
-    protected function process_ping($seqid, $input, $output)
-    {
-        $bin_accel = ($input instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_read_binary_after_message_begin');
-        if ($bin_accel) {
-            $args = thrift_protocol_read_binary_after_message_begin(
-                $input,
-                '\tutorial\Calculator_ping_args',
-                $input->isStrictRead()
-            );
-        } else {
-            $args = new \tutorial\Calculator_ping_args();
-            $args->read($input);
-        }
-        $input->readMessageEnd();
-        $result = new \tutorial\Calculator_ping_result();
-        $this->handler_->ping();
-        $bin_accel = ($output instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
-        if ($bin_accel) {
-            thrift_protocol_write_binary(
-                $output,
-                'ping',
-                TMessageType::REPLY,
-                $result,
-                $seqid,
-                $output->isStrictWrite()
-            );
-        } else {
-            $output->writeMessageBegin('ping', TMessageType::REPLY, $seqid);
-            $result->write($output);
-            $output->writeMessageEnd();
-            $output->getTransport()->flush();
-        }
-    }
-    protected function process_add($seqid, $input, $output)
-    {
-        $bin_accel = ($input instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_read_binary_after_message_begin');
-        if ($bin_accel) {
-            $args = thrift_protocol_read_binary_after_message_begin(
-                $input,
-                '\tutorial\Calculator_add_args',
-                $input->isStrictRead()
-            );
-        } else {
-            $args = new \tutorial\Calculator_add_args();
-            $args->read($input);
-        }
-        $input->readMessageEnd();
-        $result = new \tutorial\Calculator_add_result();
-        $result->success = $this->handler_->add($args->num1, $args->num2);
-        $bin_accel = ($output instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
-        if ($bin_accel) {
-            thrift_protocol_write_binary(
-                $output,
-                'add',
-                TMessageType::REPLY,
-                $result,
-                $seqid,
-                $output->isStrictWrite()
-            );
-        } else {
-            $output->writeMessageBegin('add', TMessageType::REPLY, $seqid);
-            $result->write($output);
-            $output->writeMessageEnd();
-            $output->getTransport()->flush();
-        }
-    }
-    protected function process_calculate($seqid, $input, $output)
-    {
-        $bin_accel = ($input instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_read_binary_after_message_begin');
-        if ($bin_accel) {
-            $args = thrift_protocol_read_binary_after_message_begin(
-                $input,
-                '\tutorial\Calculator_calculate_args',
-                $input->isStrictRead()
-            );
-        } else {
-            $args = new \tutorial\Calculator_calculate_args();
-            $args->read($input);
-        }
-        $input->readMessageEnd();
-        $result = new \tutorial\Calculator_calculate_result();
-        try {
-            $result->success = $this->handler_->calculate($args->logid, $args->w);
-        } catch (\tutorial\InvalidOperation $ouch) {
-            $result->ouch = $ouch;
-        }
-        $bin_accel = ($output instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_write_binary');
-        if ($bin_accel) {
-            thrift_protocol_write_binary(
-                $output,
-                'calculate',
-                TMessageType::REPLY,
-                $result,
-                $seqid,
-                $output->isStrictWrite()
-            );
-        } else {
-            $output->writeMessageBegin('calculate', TMessageType::REPLY, $seqid);
-            $result->write($output);
-            $output->writeMessageEnd();
-            $output->getTransport()->flush();
-        }
-    }
-    protected function process_zip($seqid, $input, $output)
-    {
-        $bin_accel = ($input instanceof TBinaryProtocolAccelerated) && function_exists('thrift_protocol_read_binary_after_message_begin');
-        if ($bin_accel) {
-            $args = thrift_protocol_read_binary_after_message_begin(
-                $input,
-                '\tutorial\Calculator_zip_args',
-                $input->isStrictRead()
-            );
-        } else {
-            $args = new \tutorial\Calculator_zip_args();
-            $args->read($input);
-        }
-        $input->readMessageEnd();
-        $this->handler_->zip();
-        return;
     }
 }
