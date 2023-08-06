@@ -1,0 +1,33 @@
+# Ignorar diretórios de dependências gerados pelo Composer
+/vendor/
+
+# Ignorar arquivos de configuração local
+/config/local.php
+
+# Ignorar arquivos gerados pelo PHP, como logs e caches
+/log/
+/cache/
+
+# Ignorar arquivos de build ou artefatos de compilação
+/build/
+/dist/
+/*.phar
+
+# Ignorar arquivos de ambiente (ex.: .env)
+.env
+
+# Ignorar arquivos de IDE e editor
+/.vscode/
+/.idea/
+*.sublime-*
+*.phpstorm.meta.php
+
+# Ignorar arquivos de configuração do Composer
+composer.lock
+
+# Ignorar arquivos de backup
+*~
+*.bak
+
+# Ignorar arquivos de logs
+*.log
