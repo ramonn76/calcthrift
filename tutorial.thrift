@@ -1,7 +1,7 @@
 
 namespace php tutorial
 
-service Calculator {
+service HelloService {
    string hello(1:string nome),
 }
 

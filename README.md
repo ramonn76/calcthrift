@@ -8,9 +8,13 @@ Certifique-se de ter o Thrift instalado em seu sistema. Você pode baixar o Thri
 
 ## Passos para executar o projeto
 
-1. Navegue para a pasta "src" do projeto.
+1. Execute o seguinte comando para instalar as dependências do projeto:
+   ```
+   composer install
+   ```
+2. Navegue para a pasta "src" do projeto.
 
-2. Execute o comando abaixo para gerar o código PHP a partir do arquivo "tutorial.thrift":
+3. Execute o comando abaixo para gerar o código PHP a partir do arquivo "tutorial.thrift":
 
    ```
    thrift --gen php:server -r ../tutorial.thrift
@@ -18,6 +22,7 @@ Certifique-se de ter o Thrift instalado em seu sistema. Você pode baixar o Thri
 
    Isso criará o código PHP necessário para implementar o servidor.
 
+  
 3. Em um terminal, execute o servidor PHP executando o seguinte comando:
 
    ```
